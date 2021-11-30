@@ -1,0 +1,21 @@
+{
+  "name": "team-16-gateway",
+  "version": "1.0.0",
+  "description": "middle man for system",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index",
+    "test": "node console.log(\"hello\")"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.chalmers.se:courses/dit355/test-teams-formation/team-16/team-16-gateway.git"
+  },
+  "author": "group 16",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "mqtt": "^4.2.8"
+  }
+}
