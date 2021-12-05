@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "middle man for system",
   "main": "index.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
-    "dev": "node src/index",
+    "dev": "nodemon index",
     "test": "node console.log(\"hello\")"
   },
   "repository": {
@@ -17,5 +17,8 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "mqtt": "^4.2.8"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
   }
 }
