@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "dotenv": "^10.0.0",
+    "mongoose": "^6.0.15",
     "mqtt": "^4.2.8"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 const userHandler = require("../users")
+const model = require("../models/log")
 const client = require("../Client")
 const { log } = console;
 
@@ -13,7 +14,7 @@ client.subscribe("bookings/#");
 // listen for other sub-systems
 client.subscribe("api/gateway/#");
 
-client.on("message", (t, m) => {
+client.on("message", (t, m) => { // users/login -> users
   // users/login
   const msg = m.toString();
   const base = t.split("/")[0]; // users or bookings
@@ -23,21 +24,62 @@ client.on("message", (t, m) => {
     const topic = t.replace("api/gateway/", "");
     const base = topic.split("/")[0];
     if (base === "users") {
-      
+      let logMsg;
+      if (topic === "/login" || topic === "/register") {
+        const o = JSON.parse(msg);
+        o["password"] = "**********";
+        logMsg = JSON.stringify(o);
+      } else {
+        logMsg = msg;
+      }
+      model.create({
+        timestamp: Date.now(),
+        client: "User Management",
+        topic: t,
+        message: logMsg,
+      });
+      // strips off api/gateway/users 
       userHandler(topic.replace(base + "/", ""), msg)
       // publish back to frontend
       // this should go to functions ( in another file that handle users)
       //client.publish(usersPath + topic, msg);
     }
     if (base === "bookings") {
+      model.create({
+        timestamp: Date.now(),
+        client: "Booking Management",
+        topic: t,
+        message: logMsg,
+      });
       // this should go to functions ( in another file that handle bookigs)
       //client.publish(bookingsPath + topic, msg);
     }
   }
   if (base === "users") {
+    let logMsg
+    if (topic === "/login" || topic === "/register") {
+      const o = JSON.parse(msg)
+      o["password"] = "**********"
+      logMsg  = JSON.stringify(o)
+    } else {
+      logMsg = msg
+    }
+    model.create({
+      timestamp: Date.now(),
+      client: "User Interface",
+      topic: t,
+      message: logMsg
+    })
     client.publish(usersPath + topic, msg); // users/login -> api/users/login
+    
   }
   if (base === "bookings") {
+    model.create({
+      timestamp: Date.now(),
+      client: "User Interface",
+      topic: t,
+      message: logMsg,
+    });
     client.publish(bookingsPath + topic, msg);
   }
 });

@@ -1,3 +1,4 @@
+const { log } = console;
 const client = require("mqtt").connect({
   clientId: "Gateway",
   hostname: process.env.BROKER_URI,
@@ -14,4 +15,5 @@ client.on("connect", (ack) => {
   console.log("mqtt client connected!");
 });
 
-module.exports = client
+
+module.exports = client;
