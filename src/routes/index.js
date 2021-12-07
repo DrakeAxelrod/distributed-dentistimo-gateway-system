@@ -2,6 +2,7 @@ const userHandler = require("../users")
 const model = require("../models/log")
 const client = require("../Client")
 const { log } = console;
+const bookingHandler = require('../bookings/index')
 
 // base topics used to forward to subsystems
 const usersPath = "api/users";
@@ -16,7 +17,7 @@ client.subscribe("api/gateway/#");
 
 client.on("message", (t, m) => { // users/login -> users
   // users/login
-  const msg = m.toString();
+  const msg = m
   const base = t.split("/")[0]; // users or bookings
   const topic = t.replace(base, ""); // /login
   if (base === "api") {
@@ -49,9 +50,10 @@ client.on("message", (t, m) => { // users/login -> users
         timestamp: Date.now(),
         client: "Booking Management",
         topic: t,
-        message: logMsg,
+        message: msg,
       });
       // this should go to functions ( in another file that handle bookigs)
+      bookingHandler(topic.replace(base + "/", ""), msg)
       //client.publish(bookingsPath + topic, msg);
     }
   }
@@ -78,11 +80,15 @@ client.on("message", (t, m) => { // users/login -> users
       timestamp: Date.now(),
       client: "User Interface",
       topic: t,
-      message: logMsg,
+      message: msg
     });
     client.publish(bookingsPath + topic, msg);
   }
 });
+
+setInterval(() => {
+  client.publish(bookingsPath + '/all', "{hi: something}")
+}, 1000)
 
 //temp func for demo purposes
 const allUsers = () => {
