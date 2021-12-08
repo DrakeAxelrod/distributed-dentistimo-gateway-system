@@ -8,6 +8,7 @@ module.exports = bookingsHandler = (t, m) => {
 };
 
 client.on('all', (t, m) => {
+    console.log("here")
     console.log(m)
     client.publish(`${responsePath}/${t}`, m)
 })
