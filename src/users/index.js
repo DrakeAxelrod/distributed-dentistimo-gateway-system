@@ -11,7 +11,6 @@ client.on("login", (t, m) => {
 })
 
 client.on("register", (t, m) => {
-  console.log(m.toString())
   client.publish(`${responsePath}/${t}`, m)
 })
 
