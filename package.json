@@ -17,7 +17,8 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "mongoose": "^6.0.15",
-    "mqtt": "^4.2.8"
+    "mqtt": "^4.2.8",
+    "opossum": "^6.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

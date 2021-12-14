@@ -2,6 +2,14 @@ const userHandler = require("../users")
 const model = require("../models/log")
 const client = require("../Client")
 const bookingHandler = require('../bookings/index')
+const CircuitBreaker = require("opossum");
+
+const options = {
+  timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
+  errorThresholdPercentage: 50, // When 50% of requests fail, trip the circuit
+  resetTimeout: 30000, // After 30 seconds, try again.
+};
+
 
 // base topics used to forward to subsystems
 const usersPath = "api/users";
@@ -14,7 +22,6 @@ client.subscribe("api/gateway/#");
 
 
 const logging = (system, topic,  msg) => {
-  let logMsg;
   if (msg.hasOwnProperty("password")) {
     const obj = JSON.parse(msg);
     obj["password"] = "**********";
@@ -48,12 +55,27 @@ client.on("message", (t, m) => {
     }
   }
   if (base === "users") {
-    logging("User Interface", t, msg)
-    client.publish(usersPath + topic, msg);
-    
+    logging("User Interface", t, msg);
+    const breaker = new CircuitBreaker(
+      client.publish(usersPath + topic, msg),
+      options
+    );
+    const result = breaker
+      .fire(t, m)
+      .then((res) => res)
+      .catch(console.error);
+    //client.publish(usersPath + topic, msg);
   }
   if (base === "bookings") {
     logging("User Interface", t, msg)
-    client.publish(bookingsPath + topic, msg);
+    const breaker = new CircuitBreaker(
+      client.publish(bookingsPath + topic, msg),
+      options
+    );
+    const result = breaker
+      .fire(t, m)
+      .then((res) => res)
+      .catch(console.error);
+    //client.publish(bookingsPath + topic, msg);
   }
 });
