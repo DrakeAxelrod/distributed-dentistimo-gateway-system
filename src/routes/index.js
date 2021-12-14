@@ -30,6 +30,7 @@ const logging = (system, topic,  msg) => {
   });
 }
 
+// routing
 client.on("message", (t, m) => {
   const msg = m.toString()
   const base = t.split("/")[0];

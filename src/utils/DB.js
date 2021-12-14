@@ -3,7 +3,6 @@ const { log } = console;
 require('dotenv').config()
 
 const uri = process.env.MONGODB_URI;
-console.log(uri)
 const connect = () => {
   const database = mongoose.connect(uri, {}, (err) => {
     if (!err) {
