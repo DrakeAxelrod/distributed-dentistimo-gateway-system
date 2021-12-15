@@ -15,10 +15,10 @@ const options = {
 const usersPath = "api/users";
 const bookingsPath = "api/bookings";
 // listen for frontend
-client.subscribe("users/#");
-client.subscribe("bookings/#");
+client.subscribe("users/#", { qos: 2 });
+client.subscribe("bookings/#", { qos: 2 });
 // listen for other sub-systems
-client.subscribe("api/gateway/#");
+client.subscribe("api/gateway/#", { qos: 2 });
 
 
 const logging = (system, topic,  msg) => {
@@ -38,7 +38,7 @@ const logging = (system, topic,  msg) => {
 }
 
 // routing
-client.on("message", (t, m) => {
+const breaker = new CircuitBreaker(client.on("message", (t, m) => {
   const msg = m.toString()
   const base = t.split("/")[0];
   const topic = t.replace(base, "");
@@ -78,4 +78,10 @@ client.on("message", (t, m) => {
       .catch(console.error);
     //client.publish(bookingsPath + topic, msg);
   }
+}), {
+  timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
+  errorThresholdPercentage: 25, // When 25% of requests fail, trip the circuit
+  resetTimeout: 10000, // After 10 seconds, try again.
 });
+
+breaker.fire()
