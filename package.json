@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
+    "start": "node index.js",
     "dev": "nodemon index",
     "test": "node console.log(\"hello\")"
   },
@@ -17,8 +18,7 @@
   "dependencies": {
     "dotenv": "^10.0.0",
     "mongoose": "^6.0.15",
-    "mqtt": "^4.2.8",
-    "opossum": "^6.2.1"
+    "mqtt": "^4.2.8"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"

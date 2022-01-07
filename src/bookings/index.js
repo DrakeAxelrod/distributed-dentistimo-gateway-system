@@ -1,11 +1,4 @@
-const client = require("../Client")
-const CircuitBreaker = require('opossum');
-
-const options = {
-  timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
-  errorThresholdPercentage: 50, // When 50% of requests fail, trip the circuit
-  resetTimeout: 30000 // After 30 seconds, try again.
-};
+const client = require("../utils/Client")
 
 const responsePath = "frontend/bookings"
 
@@ -84,6 +77,7 @@ client.on("available", (t, m) => {
     const msg = JSON.parse(m);
     const { message, booked } = msg
     const clinicName = message.clinic.name;
+    console.log(booked)
 
     const bookedAppointments = booked.filter((booking) => {
       const sameName = booking.clinic.name === clinicName;
@@ -95,14 +89,9 @@ client.on("available", (t, m) => {
     });
     const available = getAllBookingsForDay(message, bookedAppointments);
   client.publish(`${responsePath}/${t}`, JSON.stringify(available));
-  //client.publish(`${responsePath}/${t}`, m);
 });
 
 
 client.on("confirm", (t, m) => {
-  const breaker = new CircuitBreaker(client.publish(`${responsePath}/${t}`, m), options);
-  const result = breaker.fire(t, m)
-  .then(res => res)
-  .catch(console.error)
-  //client.publish(`${responsePath}/${t}`, m);
+  client.publish(`${responsePath}/${t}`, m);
 });

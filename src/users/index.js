@@ -1,4 +1,4 @@
-const client = require("../Client")
+const client = require("../utils/Client")
 
 const responsePath = "frontend/users"
 

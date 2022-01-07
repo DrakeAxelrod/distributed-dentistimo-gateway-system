@@ -1,15 +1,7 @@
 const userHandler = require("../users")
 const model = require("../models/log")
-const client = require("../Client")
+const client = require("../utils/Client")
 const bookingHandler = require('../bookings/index')
-const CircuitBreaker = require("opossum");
-
-const options = {
-  timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
-  errorThresholdPercentage: 50, // When 50% of requests fail, trip the circuit
-  resetTimeout: 30000, // After 30 seconds, try again.
-};
-
 
 // base topics used to forward to subsystems
 const usersPath = "api/users";
@@ -38,7 +30,7 @@ const logging = (system, topic,  msg) => {
 }
 
 // routing
-const breaker = new CircuitBreaker(client.on("message", (t, m) => {
+client.on("message", (t, m) => {
   const msg = m.toString()
   const base = t.split("/")[0];
   const topic = t.replace(base, "");
@@ -56,32 +48,10 @@ const breaker = new CircuitBreaker(client.on("message", (t, m) => {
   }
   if (base === "users") {
     logging("User Interface", t, msg);
-    const breaker = new CircuitBreaker(
-      client.publish(usersPath + topic, msg),
-      options
-    );
-    const result = breaker
-      .fire(t, m)
-      .then((res) => res)
-      .catch(console.error);
-    //client.publish(usersPath + topic, msg);
+    client.publish(usersPath + topic, msg);
   }
   if (base === "bookings") {
     logging("User Interface", t, msg)
-    const breaker = new CircuitBreaker(
-      client.publish(bookingsPath + topic, msg),
-      options
-    );
-    const result = breaker
-      .fire(t, m)
-      .then((res) => res)
-      .catch(console.error);
-    //client.publish(bookingsPath + topic, msg);
+    client.publish(bookingsPath + topic, msg);
   }
-}), {
-  timeout: 3000, // If our function takes longer than 3 seconds, trigger a failure
-  errorThresholdPercentage: 25, // When 25% of requests fail, trip the circuit
-  resetTimeout: 10000, // After 10 seconds, try again.
-});
-
-breaker.fire()
+})
